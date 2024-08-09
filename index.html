@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Wallet Connect Page</title>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+<!-- Cartoony, old-style font -->
+<style>
+body {
+  margin: 0;
+  padding: 0;
+  background-color: #121212; /* Dark background for contrast */
+  color: #e0e0e0; /* Light text color */
+  font-family: 'Press Start 2P', cursive; /* Cartoony, old-style font */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.container {
+  text-align: center;
+  position: relative;
+  width: 90%; /* Full width on mobile */
+  max-width: 350px; /* Max width for larger screens */
+}
+
+.particle-effect {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: -1;
+  overflow: hidden;
+}
+
+.particle {
+  position: absolute;
+  background-color: #ffffff; /* White particles */
+  width: 8px; /* Initial size */
+  height: 8px;
+  opacity: 0.6;
+  transition: opacity 0.5s ease, box-shadow 0.5s ease; /* Smooth fade and glow */
+}
+
+@keyframes particleMove {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-15px); }
+}
+
+.wallet-bar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #ffffff; /* White background for the bar */
+  border-radius: 8px; /* Rounded corners */
+  overflow: hidden;
+  width: 100%; /* Full width on mobile */
+  max-width: 300px; /* Max width for larger screens */
+  height: 45px;
+  position: relative;
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.5); /* Soft glow effect */
+  transition: box-shadow 0.3s ease, transform 0.3s ease;
+  border: 1px solid #cccccc; /* Light border */
+  margin: 0 auto; /* Center horizontally */
+}
+
+.wallet-bar:hover {
+  transform: scale(1.05); /* Slightly enlarge on hover */
+}
+
+.wallet-bar input {
+  border: none;
+  outline: none;
+  padding: 0 10px;
+  width: calc(100% - 70px); /* Adjust width to fit the bar */
+  height: 100%;
+  font-size: 14px; /* Smaller font size */
+  background: transparent;
+  color: #333; /* Darker text color for contrast */
+  border-radius: 8px 0 0 8px; /* Rounded corners on the left */
+}
+
+.wallet-bar input.animating {
+  animation: pixelLight 1s steps(5, end) infinite; /* Particle-like animation */
+}
+
+.wallet-bar button {
+  border: none;
+  background-color: #ffffff; /* White background */
+  color: #333; /* Dark text color for contrast */
+  padding: 0 15px;
+  height: 100%;
+  cursor: pointer;
+  font-size: 14px; /* Smaller font size */
+  border-radius: 0 8px 8px 0; /* Rounded corners on the right */
+  transition: background-color 0.3s ease, box-shadow 0.3s ease;
+  box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2); /* Inner shadow for depth */
+  font-family: 'Press Start 2P', cursive; /* Cartoony, old-style font */
+}
+
+.wallet-bar button.connected {
+  background-color: #f0f0f0; /* Slightly darker white for connected state */
+  color: #666; /* Darker text color */
+}
+
+.wallet-bar.glow {
+  box-shadow: 0 0 15px rgba(255, 255, 255, 0.8); /* Enhanced glow effect */
+}
+
+#error-message {
+  color: white; /* White color for the error message */
+  font-family: 'Press Start 2P', cursive; /* Cartoony, old-style font */
+  display: none; /* Hidden by default */
+  margin-top: 10px;
+  font-size: 12px; /* Smaller font size */
+  text-shadow: 0 0 10px rgba(255, 255, 255, 0.8); /* Glowing white effect */
+}
+
+/* Media query for smaller screens */
+@media (max-width: 600px) {
+  .wallet-bar {
+    height: 40px; /* Adjust height for smaller screens */
+    max-width: 280px; /* Smaller max width */
+  }
+  .wallet-bar input, .wallet-bar button {
+    font-size: 12px; /* Even smaller font size */
+    padding: 0 8px; /* Adjust padding */
+  }
+}
+</style>
+</head>
+<body>
+<div class="particle-effect" id="particleEffect"></div>
+<div class="container">
+  <div class="wallet-bar" id="walletBar">
+    <input type="text" id="walletAddress" placeholder="Enter wallet address...">
+    <button id="connectButton">Connect</button>
+  </div>
+  <p id="error-message">Please enter a correct Ethereum address wallet.</p>
+</div>
+<script>
+const connectButton = document.getElementById('connectButton');
+const walletBar = document.getElementById('walletBar');
+const walletAddress = document.getElementById('walletAddress');
+const particleEffect = document.getElementById('particleEffect');
+const errorMessage = document.getElementById('error-message');
+
+// Create particles
+function createParticles() {
+  for (let i = 0; i < 150; i++) {
+    const particle = document.createElement('div');
+    particle.className = 'particle';
+    particle.style.left = `${Math.random() * 100}%`;
+    particle.style.top = `${Math.random() * 100}%`;
+    particle.style.width = `${Math.random() * 8 + 6}px`; // Set initial size
+    particle.style.height = particle.style.width;
+    particle.style.animation = `particleMove ${Math.random() * 2 + 1}s infinite`; // Movement animation
+    particleEffect.appendChild(particle);
+  }
+}
+
+// Update particles on button click
+function updateParticles(isConnected) {
+  const particles = document.querySelectorAll('.particle');
+  particles.forEach(particle => {
+    if (isConnected) {
+      particle.style.boxShadow = '0 0 15px rgba(255, 255, 255, 0.8)'; // White glow
+      particle.style.opacity = '0.8'; // Bright particles
+    } else {
+      particle.style.boxShadow = '0 0 5px rgba(0, 0, 0, 0.5)'; // Darker, less glowing
+      particle.style.opacity = '0.5'; // Darker particles
+    }
+  });
+}
+
+createParticles();
+
+function isValidEthereumAddress(address) {
+  return /^(0x)?[0-9a-fA-F]{40}$/.test(address);
+}
+
+connectButton.addEventListener('click', () => {
+  const address = walletAddress.value;
+  if (!isValidEthereumAddress(address)) {
+    errorMessage.style.display = 'block'; // Show error message
+    walletBar.style.boxShadow = '0 0 15px red'; // Red glow on error
+    return;
+  }
+  errorMessage.style.display = 'none'; // Hide error message
+  walletBar.style.boxShadow = 'none'; // Remove red glow
+  if (connectButton.classList.contains('connected')) {
+    connectButton.textContent = 'Connect';
+    connectButton.classList.remove('connected');
+    walletAddress.disabled = false; // Enable input field
+    walletBar.classList.remove('glow');
+    updateParticles(false); // Update particles to non-glowing
+  } else {
+    connectButton.textContent = 'Connected';
+    connectButton.classList.add('connected');
+    walletAddress.disabled = true; // Disable input field
+    walletBar.classList.add('glow');
+    updateParticles(true); // Update particles to glowing
+  }
+});
+</script>
+</body>
+</html>
