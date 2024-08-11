@@ -33,7 +33,7 @@ body {
   width: 100%;
   height: 100%;
   pointer-events: none;
-  z-index: -1;
+  z-index: -2;
   overflow: hidden;
 }
 
@@ -66,6 +66,7 @@ body {
   transition: box-shadow 0.3s ease, transform 0.3s ease;
   border: 1px solid #cccccc; /* Light border */
   margin: 0 auto; /* Center horizontally */
+  z-index: 2;
 }
 
 .wallet-bar:hover {
@@ -131,11 +132,37 @@ body {
     padding: 0 8px; /* Adjust padding */
   }
 }
+
+.gif-container {
+  position: absolute;
+  top: 45%;
+  left: 30%; /* Adjust this value to change the position */
+  width: 400px; /* Increase the size */
+  height: 150px; /* Increase the size */
+  transform: translate(-50%, -50%); /* Center vertically */
+  z-index: 1;
+  display: none; /* Hidden by default */
+}
+
+.gif-container img {
+  width: 100%;
+  height: auto;
+  filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.8)); /* White glow effect */
+  transition: filter 0.3s ease;
+}
+
+.gif-container.glow img {
+  filter: drop-shadow(0 0 20px rgba(255, 255, 255, 1)); /* Stronger white glow effect */
+}
+
 </style>
 </head>
 <body>
 <div class="particle-effect" id="particleEffect"></div>
 <div class="container">
+  <div class="gif-container" id="gifContainer">
+    <img src="2.gif" alt="Animated GIF">
+  </div>
   <div class="wallet-bar" id="walletBar">
     <input type="text" id="walletAddress" placeholder="Enter wallet address...">
     <button id="connectButton">Connect</button>
@@ -144,6 +171,7 @@ body {
 </div>
 <script>
 const connectButton = document.getElementById('connectButton');
+const gifContainer = document.getElementById('gifContainer');
 const walletBar = document.getElementById('walletBar');
 const walletAddress = document.getElementById('walletAddress');
 const particleEffect = document.getElementById('particleEffect');
@@ -197,12 +225,16 @@ connectButton.addEventListener('click', () => {
     connectButton.classList.remove('connected');
     walletAddress.disabled = false; // Enable input field
     walletBar.classList.remove('glow');
+    gifContainer.style.display = 'none'; // Hide GIF
+    gifContainer.classList.remove('glow');
     updateParticles(false); // Update particles to non-glowing
   } else {
     connectButton.textContent = 'Connected';
     connectButton.classList.add('connected');
     walletAddress.disabled = true; // Disable input field
     walletBar.classList.add('glow');
+    gifContainer.style.display = 'block'; // Show GIF
+    gifContainer.classList.add('glow');
     updateParticles(true); // Update particles to glowing
   }
 });
